@@ -20,7 +20,7 @@ public class BaseBot {
                 .addCommand(new PingCommand());
 
         new JDABuilder(AccountType.BOT)
-                .setToken("")
+                .setToken("Nzc2MDEwNzA1MDIyNzQ2NjM2.X6uqSQ.l5esnYx2hIr9hOK5dveF-zd2rPs")
                 .setActivity(Activity.playing("j!help"))
                 .setStatus(OnlineStatus.IDLE)
                 .addEventListeners(waiter, client.build())
