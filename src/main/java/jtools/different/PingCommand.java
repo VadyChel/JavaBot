@@ -6,11 +6,11 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 public class PingCommand extends Command {
     public PingCommand(){
         this.name = "ping";
+        this.help = "Sends a my API ping";
     }
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        System.out.println(commandEvent.getJDA().getGatewayPing());
-        commandEvent.reply("Hello, my ping is " + commandEvent.getJDA().getGatewayPing());
+        commandEvent.reply("Hello" + commandEvent.getAuthor().getName() + ", my ping is " + commandEvent.getJDA().getGatewayPing());
     }
 }
