@@ -11,6 +11,6 @@ public class PingCommand extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        commandEvent.reply("Hello" + commandEvent.getAuthor().getName() + ", my ping is " + commandEvent.getJDA().getGatewayPing());
+        commandEvent.reply("Hello " + commandEvent.getAuthor().getName() + ", my ping is " + commandEvent.getJDA().getGatewayPing());
     }
 }

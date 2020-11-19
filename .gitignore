@@ -25,3 +25,6 @@ hs_err_pid*
 # Intellij Idea files
 .idea
 /target/
+
+# Config file
+src/main/java/jtools/Config.properties
