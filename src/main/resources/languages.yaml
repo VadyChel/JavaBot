@@ -1,0 +1,46 @@
+ru:
+  - commands:
+      - name: avatar
+        description: Отправляет ваш аватар
+        usage: avatar <@Участник>
+      - name: help
+        description: Отправляет помощь по командам
+        usage: help
+      - name: serverinfo
+        description: Отправляет информацию о сервере
+        usage: serverinfo
+      - name: userinfo
+        description: Отправляет информацию о пользователе
+        usage: userinfo <@Участник>
+      - name: botinfo
+        description: Отправляет информацию о боте
+        usage: botinfo
+      - name: stats
+        description: Отправляет статистику бота
+        usage: stats
+      - name: ping
+        description: Отправляет пинг бота
+        usage: ping
+ua:
+  - commands:
+      - name: avatar
+        description: Відправляє ваш аватар
+        usage: avatar <@Учасник>
+      - name: help
+        description: Відправляє допомогу по командам
+        usage: help
+      - name: serverinfo
+        description: Відправляє інформацію сервера
+        usage: serverinfo
+      - name: userinfo
+        description: Відправляє інформацію користувача
+        usage: userinfo <@Участник>
+      - name: botinfo
+        description: Відправляє інформацію бота
+        usage: botinfo
+      - name: stats
+        description: Відправляє статистику бота
+        usage: stats
+      - name: ping
+        description: Відправляє затримку бота
+        usage: ping

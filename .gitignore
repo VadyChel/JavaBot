@@ -27,4 +27,4 @@ hs_err_pid*
 /target/
 
 # Config file
-src/main/java/jtools/Config.properties
+src/main/resources/Config.properties

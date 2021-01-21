@@ -1,4 +1,4 @@
-package jtools.different;
+package jtools.commands.different;
 
 public class GuildInfoCommand {
 }
