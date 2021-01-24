@@ -19,4 +19,5 @@ public interface ICommandContext {
     Member getMember();
     SelfUser getSelfUser();
     List<String> getArgs();
+    Map<String, String> getLanguage();
 }

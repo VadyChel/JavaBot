@@ -1,14 +1,17 @@
 package jtools.tools;
 
+import jtools.jTools;
 import net.dv8tion.jda.api.entities.User;
 import org.yaml.snakeyaml.Yaml;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class Utils {
     public String getAvatar(User user){
-        System.out.println(user.getAvatarUrl()+"?size=2048");
         return user.getAvatarUrl()+"?size=2048";
     }
 
@@ -17,7 +20,13 @@ public class Utils {
         InputStream inputStream = this.getClass()
             .getClassLoader()
             .getResourceAsStream("languages.yaml");
-        Map<String, List<Map<String, List<Map<String, String>>>>> languages = yaml.load(inputStream);
-        return languages;
+        return yaml.load(inputStream);
+    }
+
+    public Properties getProperties() throws IOException {
+        InputStream propertiesFile = jTools.class.getClassLoader().getResourceAsStream("Config.properties");
+        Properties properties = new Properties();
+        properties.load(propertiesFile);
+        return properties;
     }
 }

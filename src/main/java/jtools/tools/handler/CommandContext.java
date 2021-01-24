@@ -59,4 +59,8 @@ public class CommandContext implements ICommandContext {
     public List<String> getArgs(){
         return this.args;
     }
+
+    public Map<String, String> getLanguage(){
+        return this.getCommand().getLanguage(getGuild().getIdLong());
+    }
 }

@@ -2,6 +2,9 @@ package jtools.tools.handler;
 
 import jtools.tools.Utils;
 import jtools.tools.bases.BaseCommand;
+import jtools.tools.services.database.Database;
+import jtools.tools.handler.exceptions.CheckFailureException;
+import jtools.tools.handler.exceptions.CommandException;
 import jtools.tools.impl.ICommandManager;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import java.util.ArrayList;
@@ -12,12 +15,16 @@ import java.util.regex.Pattern;
 
 public class CommandManager implements ICommandManager {
     private final Utils utils;
+    private final Database databaseService;
     private final ArrayList<BaseCommand> commands = new ArrayList<>();
     private final Map<String, List<Map<String, List<Map<String, String>>>>> languages;
+    private final CommandEvents commandListener;
 
-    public CommandManager(Utils utils){
+    public CommandManager(Utils utils, Database databaseService, CommandEvents commandListener){
         this.utils = utils;
+        this.databaseService = databaseService;
         this.languages = this.getUtils().loadLanguages();
+        this.commandListener = commandListener;
     }
 
     public ArrayList<BaseCommand> getCommands() {
@@ -25,7 +32,16 @@ public class CommandManager implements ICommandManager {
     }
 
     public void addCommand(BaseCommand command) {
+        command.setCommandManager(this);
+        command.setDatabaseService(this.databaseService);
+        command.setUtils(this.utils);
         this.commands.add(command);
+    }
+
+    public void addCommands(BaseCommand ... commands) {
+        for(BaseCommand command: commands){
+            this.addCommand(command);
+        }
     }
 
     public void removeCommand(BaseCommand command) {
@@ -54,8 +70,41 @@ public class CommandManager implements ICommandManager {
             List<String> args = Arrays.asList(split).subList(1, split.length);
 
             CommandContext ctx = new CommandContext(event, command, args);
+            if(!command.getTargetChannels(ctx.getGuild().getIdLong()).isEmpty()){
+                if(!command.getIgnoreChannels(ctx.getGuild().getIdLong()).contains(ctx.getChannel().getIdLong())){
+                    this.terminateCommand(ctx, new CheckFailureException("You don't have target role"));
+                    return;
+                }
+            }
+
+            if(!command.getTargetRoles(ctx.getGuild().getIdLong()).isEmpty()){
+                if(ctx.getMember().getRoles().stream().noneMatch(role -> command.getIgnoreRoles(ctx.getGuild().getIdLong()).contains(role.getIdLong()))){
+                    this.terminateCommand(ctx, new CheckFailureException("You don't use this command in target channel"));
+                    return;
+                }
+            }
+
+            if(ctx.getMember().getRoles().stream().anyMatch(role -> command.getIgnoreRoles(ctx.getGuild().getIdLong()).contains(role.getIdLong()))){
+                this.terminateCommand(ctx, new CheckFailureException("You cannot use this command"));
+                return;
+            }
+
+            if(command.getIgnoreChannels(ctx.getGuild().getIdLong()).contains(ctx.getChannel().getIdLong())){
+                this.terminateCommand(ctx, new CheckFailureException("You cannot use this command in this channel"));
+                return;
+            }
+
             command.execute(ctx);
+            this.successCommand(ctx);
         }
+    }
+
+    public void terminateCommand(CommandContext ctx, CommandException commandException){
+        this.getCommandListener().onCommandException(ctx, commandException);
+    }
+
+    public void successCommand(CommandContext ctx){
+        this.getCommandListener().onCommand(ctx);
     }
 
     public Utils getUtils(){
@@ -64,5 +113,9 @@ public class CommandManager implements ICommandManager {
 
     public Map<String, List<Map<String, List<Map<String, String>>>>> getLanguages(){
         return this.languages;
+    }
+
+    public CommandEvents getCommandListener(){
+        return this.commandListener;
     }
 }
