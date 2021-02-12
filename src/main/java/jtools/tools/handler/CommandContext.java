@@ -1,6 +1,6 @@
 package jtools.tools.handler;
 
-import jtools.tools.bases.BaseCommand;
+import jtools.tools.bases.Command;
 import jtools.tools.impl.ICommandContext;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
@@ -10,11 +10,11 @@ import java.util.Map;
 
 public class CommandContext implements ICommandContext {
     private final GuildMessageReceivedEvent event;
-    private final BaseCommand command;
+    private final Command command;
     private final List<String> args;
 
 
-    public CommandContext(GuildMessageReceivedEvent event, BaseCommand command, List<String> args){
+    public CommandContext(GuildMessageReceivedEvent event, Command command, List<String> args){
         this.event = event;
         this.command = command;
         this.args = args;
@@ -28,7 +28,7 @@ public class CommandContext implements ICommandContext {
         return this.getEvent().getChannel();
     }
 
-    public BaseCommand getCommand(){
+    public Command getCommand(){
         return this.command;
     }
 

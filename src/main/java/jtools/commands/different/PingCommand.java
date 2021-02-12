@@ -1,11 +1,12 @@
 package jtools.commands.different;
 
-import jtools.tools.bases.BaseCommand;
+import jtools.tools.bases.Command;
 import jtools.tools.handler.CommandContext;
 
-public class PingCommand extends BaseCommand {
+public class PingCommand extends Command {
     public PingCommand(){
-        super("ping", "different");
+        this.name = "ping";
+        this.category = "different";
     }
 
     @Override

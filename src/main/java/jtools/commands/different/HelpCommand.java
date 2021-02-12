@@ -1,19 +1,23 @@
 package jtools.commands.different;
 
-import jtools.tools.bases.BaseCommand;
+import jtools.checks.MainCheck;
+import jtools.tools.bases.Command;
 import jtools.tools.handler.CommandContext;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-public class HelpCommand extends BaseCommand {
+public class HelpCommand extends Command {
     public HelpCommand(){
-        super("help", "different");
+        this.name = "help";
+        this.category = "different";
+        this.addChild(new Help2Command());
+        this.addCheck(new MainCheck());
     }
 
     @Override
     public void execute(CommandContext ctx) {
         long guildId = ctx.getGuild().getIdLong();
         StringBuilder description = new StringBuilder();
-        for(BaseCommand command: ctx.getCommand().getCommandManager().getCommands()){
+        for(Command command: ctx.getCommand().getCommandManager().getCommands()){
             description.append(String.format("j!%s - %s\n", command.getUsage(guildId), command.getDescription(guildId)));
         }
         EmbedBuilder embed = new EmbedBuilder()

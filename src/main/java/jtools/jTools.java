@@ -1,5 +1,6 @@
 package jtools;
 
+import jtools.checks.MainCheck;
 import jtools.listeners.CommandListener;
 import jtools.tools.Utils;
 import jtools.tools.services.database.Database;
@@ -23,13 +24,12 @@ public class jTools {
         CommandManager commandManager = new CommandManager(utils, databaseService, commandListener);
         commandManager.addCommands(
             new AvatarCommand(),
-            new HelpCommand(),
-            new PingCommand()
+            new PingCommand(),
+            new HelpCommand()
         );
-        CommandHandler commandHandler = new CommandHandler(commandManager);
-
+        commandManager.addGlobalCheck(new MainCheck());
         JDABuilder.create(properties.getProperty("token"), GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES)
-            .addEventListeners(commandHandler)
+            .addEventListeners(new CommandHandler(commandManager))
             .disableCache(CacheFlag.VOICE_STATE, CacheFlag.EMOTE)
             .setStatus(OnlineStatus.IDLE)
             .setActivity(Activity.playing("j!help"))

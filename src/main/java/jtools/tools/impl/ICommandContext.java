@@ -1,6 +1,6 @@
 package jtools.tools.impl;
 
-import jtools.tools.bases.BaseCommand;
+import jtools.tools.bases.Command;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -11,7 +11,7 @@ import java.util.Map;
 public interface ICommandContext {
     Guild getGuild();
     TextChannel getChannel();
-    BaseCommand getCommand();
+    Command getCommand();
     GuildMessageReceivedEvent getEvent();
     JDA getJDA();
     Message getMessage();

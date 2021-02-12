@@ -1,13 +1,14 @@
 package jtools.commands.different;
 
-import jtools.tools.bases.BaseCommand;
+import jtools.tools.bases.Command;
 import jtools.tools.handler.CommandContext;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 
-public class AvatarCommand extends BaseCommand {
+public class AvatarCommand extends Command {
     public AvatarCommand(){
-        super("avatar", "different");
+        this.name = "avatar";
+        this.category = "different";
     }
 
     @Override

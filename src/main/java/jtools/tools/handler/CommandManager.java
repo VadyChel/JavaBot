@@ -1,9 +1,10 @@
 package jtools.tools.handler;
 
 import jtools.tools.Utils;
-import jtools.tools.bases.BaseCommand;
-import jtools.tools.services.database.Database;
+import jtools.tools.bases.Command;
 import jtools.tools.handler.exceptions.CheckFailureException;
+import jtools.tools.impl.CommandCheck;
+import jtools.tools.services.database.Database;
 import jtools.tools.handler.exceptions.CommandException;
 import jtools.tools.impl.ICommandManager;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -16,7 +17,7 @@ import java.util.regex.Pattern;
 public class CommandManager implements ICommandManager {
     private final Utils utils;
     private final Database databaseService;
-    private final ArrayList<BaseCommand> commands = new ArrayList<>();
+    private final ArrayList<Command> commands = new ArrayList<>();
     private final Map<String, List<Map<String, List<Map<String, String>>>>> languages;
     private final CommandEvents commandListener;
 
@@ -27,29 +28,35 @@ public class CommandManager implements ICommandManager {
         this.commandListener = commandListener;
     }
 
-    public ArrayList<BaseCommand> getCommands() {
+    public ArrayList<Command> getCommands() {
         return this.commands;
     }
 
-    public void addCommand(BaseCommand command) {
+    public void addCommand(Command command) {
         command.setCommandManager(this);
         command.setDatabaseService(this.databaseService);
         command.setUtils(this.utils);
         this.commands.add(command);
     }
 
-    public void addCommands(BaseCommand ... commands) {
-        for(BaseCommand command: commands){
+    public void addCommands(Command... commands) {
+        for(Command command: commands){
             this.addCommand(command);
         }
     }
 
-    public void removeCommand(BaseCommand command) {
+    public void removeCommand(Command command) {
         this.commands.remove(command);
     }
 
-    public BaseCommand getCommand(String name) {
-        for(BaseCommand command: this.commands){
+    public void addGlobalCheck(CommandCheck obj) {
+        for(Command command: this.getCommands()){
+            command.addCheck(obj);
+        }
+    }
+
+    public Command getCommand(String name) {
+        for(Command command: this.commands){
             if(command.getName().equals(name) || command.getAliases().contains(name)){
                 return command;
             }
@@ -63,37 +70,33 @@ public class CommandManager implements ICommandManager {
             .split("\\s+");
 
         String invoke = split[0].toLowerCase();
-        BaseCommand command = this.getCommand(invoke);
+        Command command = this.getCommand(invoke);
 
         if (command != null) {
-            event.getChannel().sendTyping().queue();
             List<String> args = Arrays.asList(split).subList(1, split.length);
-
             CommandContext ctx = new CommandContext(event, command, args);
-            if(!command.getTargetChannels(ctx.getGuild().getIdLong()).isEmpty()){
-                if(!command.getIgnoreChannels(ctx.getGuild().getIdLong()).contains(ctx.getChannel().getIdLong())){
-                    this.terminateCommand(ctx, new CheckFailureException("You don't have target role"));
-                    return;
+
+            if(args.toArray().length > 0) {
+                if (!command.getChildren().isEmpty()) {
+                    for (Command child : command.getChildren()) {
+                        if (child.getName().equals(args.get(0)) || child.getAliases().contains(args.get(0))) {
+                            boolean checkState = this.checkCommand(command, ctx);
+                            if (!checkState) {
+                                this.terminateCommand(ctx, new CheckFailureException("You did not pass the checks"));
+                                return;
+                            }
+                            child.execute(ctx);
+                            this.successCommand(ctx);
+                            return;
+                        }
+                    }
                 }
             }
-
-            if(!command.getTargetRoles(ctx.getGuild().getIdLong()).isEmpty()){
-                if(ctx.getMember().getRoles().stream().noneMatch(role -> command.getIgnoreRoles(ctx.getGuild().getIdLong()).contains(role.getIdLong()))){
-                    this.terminateCommand(ctx, new CheckFailureException("You don't use this command in target channel"));
-                    return;
-                }
-            }
-
-            if(ctx.getMember().getRoles().stream().anyMatch(role -> command.getIgnoreRoles(ctx.getGuild().getIdLong()).contains(role.getIdLong()))){
-                this.terminateCommand(ctx, new CheckFailureException("You cannot use this command"));
+            boolean checkState = this.checkCommand(command, ctx);
+            if (!checkState) {
+                this.terminateCommand(ctx, new CheckFailureException("You did not pass the checks"));
                 return;
             }
-
-            if(command.getIgnoreChannels(ctx.getGuild().getIdLong()).contains(ctx.getChannel().getIdLong())){
-                this.terminateCommand(ctx, new CheckFailureException("You cannot use this command in this channel"));
-                return;
-            }
-
             command.execute(ctx);
             this.successCommand(ctx);
         }
@@ -117,5 +120,16 @@ public class CommandManager implements ICommandManager {
 
     public CommandEvents getCommandListener(){
         return this.commandListener;
+    }
+
+    private boolean checkCommand(Command command, CommandContext ctx){
+        if(!command.getChecks().isEmpty()){
+            List<Boolean> output = new ArrayList<>();
+            for(CommandCheck obj: command.getChecks()){
+                output.add(obj.check(ctx));
+            }
+            return !output.contains(false);
+        }
+        return true;
     }
 }

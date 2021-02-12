@@ -1,29 +1,28 @@
 package jtools.tools.bases;
 
 import jtools.tools.Utils;
+import jtools.tools.impl.CommandCheck;
 import jtools.tools.services.database.Database;
 import jtools.tools.handler.CommandContext;
 import jtools.tools.handler.CommandManager;
 import jtools.tools.impl.ICommand;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BaseCommand implements ICommand {
+public class Command implements ICommand {
+    protected String name = null;
+    protected String category = null;
     private Utils utils;
-    private final String name;
-    private final List<String> aliases = new ArrayList<>();
     private CommandManager commandManager;
     private Database databaseService;
-    private final String category;
     private final int cooldown = 0;
+    private final List<CommandCheck> checks = new ArrayList<>();
+    private final List<Command> children = new ArrayList<>();
+    private final List<String> aliases = new ArrayList<>();
     private final Map<String, String> emptyMap = new HashMap<>();
-
-    public BaseCommand(String name, String category) {
-        this.name = name;
-        this.category = category;
-    }
 
     public void execute(CommandContext ctx) {}
 
@@ -33,6 +32,10 @@ public class BaseCommand implements ICommand {
 
     public List<String> getAliases() {
         return this.aliases;
+    }
+
+    public List<Command> getChildren() {
+        return this.children;
     }
 
     public String getDescription(long guildId) {
@@ -47,24 +50,36 @@ public class BaseCommand implements ICommand {
         return this.getLanguage(guildId).get("help");
     }
 
-    public List<Long> getIgnoreRoles(long guildId){
-        return new ArrayList<>();
-    }
-
-    public List<Long> getIgnoreChannels(long guildId) {
-        return new ArrayList<>();
-    }
-
-    public List<Long> getTargetRoles(long guildId) {
-        return new ArrayList<>();
-    }
-
-    public List<Long> getTargetChannels(long guildId) {
-        return new ArrayList<>();
-    }
-
     public void addAlias(String alias) {
         this.aliases.add(alias);
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void addChild(Command command) {
+        this.children.add(command);
+    }
+
+    public void addChildren(Command... commands) {
+        for(Command command: commands){
+            this.addChild(command);
+        }
+    }
+
+    public void addCheck(CommandCheck obj) {
+        this.checks.add(obj);
+    }
+
+    public void addChecks(CommandCheck ... objs) {
+        for(CommandCheck obj: objs){
+            this.addCheck(obj);
+        }
     }
 
     public int getCooldown(){
@@ -81,6 +96,10 @@ public class BaseCommand implements ICommand {
 
     public Database getDatabaseService() {
         return this.databaseService;
+    }
+
+    public List<CommandCheck> getChecks() {
+        return this.checks;
     }
 
     public void setUtils(Utils utils) {

@@ -1,6 +1,7 @@
 package jtools.tools.impl;
 
 import jtools.tools.Utils;
+import jtools.tools.bases.Command;
 import jtools.tools.services.database.Database;
 import jtools.tools.handler.CommandContext;
 import jtools.tools.handler.CommandManager;
@@ -11,21 +12,25 @@ public interface ICommand {
     void execute(CommandContext ctx);
     String getName();
     String getDescription(long guildId);
-    List<String> getAliases();
     String getUsage(long guildId);
     String getHelp(long guildId);
-    List<Long> getIgnoreRoles(long guildId);
-    List<Long> getIgnoreChannels(long guildId);
-    List<Long> getTargetRoles(long guildId);
-    List<Long> getTargetChannels(long guildId);
+    String getCategory();
     int getCooldown();
     CommandManager getCommandManager();
     Utils getUtils();
-    String getCategory();
     Database getDatabaseService();
+    List<CommandCheck> getChecks();
+    List<String> getAliases();
+    List<Command> getChildren();
+    Map<String, String> getLanguage(long guildId);
     void setUtils(Utils utils);
     void setCommandManager(CommandManager commandManager);
     void setDatabaseService(Database databaseService);
     void addAlias(String alias);
-    Map<String, String> getLanguage(long guildId);
+    void setName(String name);
+    void setCategory(String category);
+    void addChild(Command command);
+    void addChildren(Command ... commands);
+    void addCheck(CommandCheck obj);
+    void addChecks(CommandCheck ... objs);
 }
