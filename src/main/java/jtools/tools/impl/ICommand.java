@@ -5,6 +5,8 @@ import jtools.tools.bases.Command;
 import jtools.tools.services.database.Database;
 import jtools.tools.handler.CommandContext;
 import jtools.tools.handler.CommandManager;
+import net.dv8tion.jda.api.Permission;
+
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +21,8 @@ public interface ICommand {
     CommandManager getCommandManager();
     Utils getUtils();
     Database getDatabaseService();
+    List<Permission> getBotPermissions();
+    List<Permission> getUserPermissions();
     List<CommandCheck> getChecks();
     List<String> getAliases();
     List<Command> getChildren();
@@ -33,4 +37,6 @@ public interface ICommand {
     void addChildren(Command ... commands);
     void addCheck(CommandCheck obj);
     void addChecks(CommandCheck ... objs);
+    void addBotPermissions(Permission permission);
+    void addUserPermissions(Permission permission);
 }

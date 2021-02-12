@@ -6,6 +6,7 @@ import jtools.tools.services.database.Database;
 import jtools.tools.handler.CommandContext;
 import jtools.tools.handler.CommandManager;
 import jtools.tools.impl.ICommand;
+import net.dv8tion.jda.api.Permission;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +20,8 @@ public class Command implements ICommand {
     private CommandManager commandManager;
     private Database databaseService;
     private final int cooldown = 0;
+    private final List<Permission> botPermissions = new ArrayList<>();
+    private final List<Permission> userPermissions = new ArrayList<>();
     private final List<CommandCheck> checks = new ArrayList<>();
     private final List<Command> children = new ArrayList<>();
     private final List<String> aliases = new ArrayList<>();
@@ -82,6 +85,14 @@ public class Command implements ICommand {
         }
     }
 
+    public void addBotPermissions(Permission permission) {
+        this.botPermissions.add(permission);
+    }
+
+    public void addUserPermissions(Permission permission) {
+        this.userPermissions.add(permission);
+    }
+
     public int getCooldown(){
         return this.cooldown;
     }
@@ -96,6 +107,14 @@ public class Command implements ICommand {
 
     public Database getDatabaseService() {
         return this.databaseService;
+    }
+
+    public List<Permission> getBotPermissions() {
+        return this.botPermissions;
+    }
+
+    public List<Permission> getUserPermissions() {
+        return this.userPermissions;
     }
 
     public List<CommandCheck> getChecks() {

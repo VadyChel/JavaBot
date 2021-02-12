@@ -1,16 +1,15 @@
 package jtools.commands.different;
 
-import jtools.checks.MainCheck;
 import jtools.tools.bases.Command;
 import jtools.tools.handler.CommandContext;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 
 public class HelpCommand extends Command {
     public HelpCommand(){
         this.name = "help";
         this.category = "different";
         this.addChild(new Help2Command());
-        this.addCheck(new MainCheck());
     }
 
     @Override

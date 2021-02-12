@@ -7,6 +7,7 @@ import jtools.tools.impl.CommandCheck;
 import jtools.tools.services.database.Database;
 import jtools.tools.handler.exceptions.CommandException;
 import jtools.tools.impl.ICommandManager;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,6 +93,7 @@ public class CommandManager implements ICommandManager {
                     }
                 }
             }
+
             boolean checkState = this.checkCommand(command, ctx);
             if (!checkState) {
                 this.terminateCommand(ctx, new CheckFailureException("You did not pass the checks"));
@@ -123,6 +125,22 @@ public class CommandManager implements ICommandManager {
     }
 
     private boolean checkCommand(Command command, CommandContext ctx){
+        if(!command.getBotPermissions().isEmpty()){
+            for(Permission permission: command.getBotPermissions()){
+                if(!ctx.getGuild().getSelfMember().hasPermission(permission)){
+                    return false;
+                }
+            }
+        }
+
+        if(!command.getUserPermissions().isEmpty()){
+            for(Permission permission: command.getUserPermissions()){
+                if(!ctx.getMember().hasPermission(permission)){
+                    return false;
+                }
+            }
+        }
+
         if(!command.getChecks().isEmpty()){
             List<Boolean> output = new ArrayList<>();
             for(CommandCheck obj: command.getChecks()){
