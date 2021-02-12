@@ -18,6 +18,7 @@ public interface ICommand {
     String getHelp(long guildId);
     String getCategory();
     int getCooldown();
+    boolean canRun(CommandContext ctx);
     CommandManager getCommandManager();
     Utils getUtils();
     Database getDatabaseService();

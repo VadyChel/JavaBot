@@ -97,6 +97,34 @@ public class Command implements ICommand {
         return this.cooldown;
     }
 
+    public boolean canRun(CommandContext ctx) {
+        if(!this.getBotPermissions().isEmpty()){
+            for(Permission permission: this.getBotPermissions()){
+                if(!ctx.getGuild().getSelfMember().hasPermission(permission)){
+                    return false;
+                }
+            }
+        }
+
+        if(!this.getUserPermissions().isEmpty()){
+            for(Permission permission: this.getUserPermissions()){
+                if(!ctx.getMember().hasPermission(permission)){
+                    return false;
+                }
+            }
+        }
+
+        if(!this.getChecks().isEmpty()){
+            List<Boolean> output = new ArrayList<>();
+            for(CommandCheck obj: this.getChecks()){
+                output.add(obj.check(ctx));
+            }
+            return !output.contains(false);
+        }
+        return true;
+
+    }
+
     public Utils getUtils(){
         return this.utils;
     }

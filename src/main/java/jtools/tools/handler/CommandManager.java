@@ -7,7 +7,6 @@ import jtools.tools.impl.CommandCheck;
 import jtools.tools.services.database.Database;
 import jtools.tools.handler.exceptions.CommandException;
 import jtools.tools.impl.ICommandManager;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,8 +80,7 @@ public class CommandManager implements ICommandManager {
                 if (!command.getChildren().isEmpty()) {
                     for (Command child : command.getChildren()) {
                         if (child.getName().equals(args.get(0)) || child.getAliases().contains(args.get(0))) {
-                            boolean checkState = this.checkCommand(command, ctx);
-                            if (!checkState) {
+                            if (!child.canRun(ctx)) {
                                 this.terminateCommand(ctx, new CheckFailureException("You did not pass the checks"));
                                 return;
                             }
@@ -94,8 +92,7 @@ public class CommandManager implements ICommandManager {
                 }
             }
 
-            boolean checkState = this.checkCommand(command, ctx);
-            if (!checkState) {
+            if (!command.canRun(ctx)) {
                 this.terminateCommand(ctx, new CheckFailureException("You did not pass the checks"));
                 return;
             }
@@ -122,32 +119,5 @@ public class CommandManager implements ICommandManager {
 
     public CommandEvents getCommandListener(){
         return this.commandListener;
-    }
-
-    private boolean checkCommand(Command command, CommandContext ctx){
-        if(!command.getBotPermissions().isEmpty()){
-            for(Permission permission: command.getBotPermissions()){
-                if(!ctx.getGuild().getSelfMember().hasPermission(permission)){
-                    return false;
-                }
-            }
-        }
-
-        if(!command.getUserPermissions().isEmpty()){
-            for(Permission permission: command.getUserPermissions()){
-                if(!ctx.getMember().hasPermission(permission)){
-                    return false;
-                }
-            }
-        }
-
-        if(!command.getChecks().isEmpty()){
-            List<Boolean> output = new ArrayList<>();
-            for(CommandCheck obj: command.getChecks()){
-                output.add(obj.check(ctx));
-            }
-            return !output.contains(false);
-        }
-        return true;
     }
 }
